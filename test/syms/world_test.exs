@@ -16,4 +16,9 @@ defmodule Syms.WorldTest do
     test "are temporary workers" do
         assert Supervisor.child_spec(Syms.World, []).restart == :temporary
     end
+
+    test "creates a world with sane defaults", %{world: world} do
+        assert Syms.World.get(world, "00") == []
+    end
+
   end

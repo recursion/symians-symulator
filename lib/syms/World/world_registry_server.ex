@@ -16,18 +16,25 @@ defmodule Syms.World.RegistryServer do
                 ref = Process.monitor(pid)
                 refs = Map.put(refs, ref, name)
                 :ets.insert(worlds, {name, pid})
-                {:reply,pid, {worlds, refs}}
+                {:reply, pid, {worlds, refs}}
             end
 
     end
     
     def handle_info({:DOWN, ref, :process, _pid, _reason}, {worlds, refs}) do
-        {name, refs} = Map.pop(refs, ref)
-        :ets.delete(worlds, name)
-        {:noreply, {worlds, refs}}
+        t = Map.pop(refs, ref)
+        IO.inspect t
+        case t do
+            {name, refs} -> 
+                :ets.delete(worlds, name)
+                {:noreply, {worlds, refs}}
+            _ -> 
+                {:noreply, {worlds, refs}}
+
+        end
     end
     
-    def handle_info(_msg, state) do
+    def handle_info(_, state) do
         {:noreply, state}
     end
 end
