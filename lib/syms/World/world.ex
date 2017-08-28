@@ -2,15 +2,13 @@ defmodule Syms.World do
     use Agent, restart: :temporary
 
     @moduledoc """
-    a world is a map of locations where each 
+    a world is a %Map{} of locations where each 
     location is indexed by its unique {x, y, z} coordinates
-
     """
 
     @default_size 5
     @default_dimensions {@default_size, @default_size, @default_size}
 
-    ## Public API
                          
     @doc """
     Starts a new world.
@@ -19,8 +17,7 @@ defmodule Syms.World do
         Agent.start_link(fn -> 
             options
             |> configure
-            |> build
-            |> IO.inspect
+            |> create
         end)
     end
 
@@ -59,7 +56,6 @@ defmodule Syms.World do
 
     ## Private functions
 
-    ## merge defaults and options
     defp configure(options) do
         ## Defaults
         [ dimensions: @default_dimensions ]
@@ -68,32 +64,24 @@ defmodule Syms.World do
 
     end
 
-    ## build a map of indexed-by-coordinate locations 
-    ## length*width*hight in size
-    defp build(%{dimensions: {length, width, height}}) do
-        Enum.map([length, width, height], fn n -> 0..n end)
+    defp create(%{dimensions: {length, width, height}}) do
+        [length, width, height]
+        |> Enum.map(fn n -> 0..n end)
         |> create_matrix
-        |> Enum.map(&Syms.World.Location.from_task(&1))
+        |> Task.yield_many
+        |> Syms.World.Location.from_tasks
         |> Map.new
     end
 
-    @doc """
-    returns a list of tasks
-    """
-    def create_matrix([length, width, height]) do
-        Enum.map(length, fn l ->
-        Enum.map(width, fn w -> 
-        Enum.map(height, fn h ->
-            Syms.World.Location.create({l, w, h})
+    defp create_matrix([length, width, height]) do
+        List.flatten Enum.map(length, fn l ->
+          Enum.map(width, fn w -> 
+            Enum.map(height, fn h ->
+              Task.async(fn -> 
+                Syms.World.Location.create({l, w, h})
+              end)
+            end)
+          end)
         end)
-        end)
-        end)
-        |> List.flatten
-        |> Task.yield_many
     end
-
-    defp enum(range, work) do
-        Enum.map(range, &work(&1))
-    end
-
 end
