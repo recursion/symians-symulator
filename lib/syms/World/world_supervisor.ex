@@ -1,14 +1,12 @@
 defmodule Syms.World.Supervisor do
     use Supervisor
-  
-    @name Syms.World.Supervisor
     
     def start_link(_opts) do
-      Supervisor.start_link(__MODULE__, :ok, name: @name)
+      Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
     end
   
     def start_world do
-        Supervisor.start_child(@name, [])
+        Supervisor.start_child(__MODULE__, [])
     end
 
     def init(:ok) do

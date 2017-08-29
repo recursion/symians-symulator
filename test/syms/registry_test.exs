@@ -11,17 +11,14 @@ defmodule Syms.RegistryTest do
       assert Syms.World.Registry.lookup(registry, name) == :error
   
       Syms.World.Registry.create(registry, name)
-      assert {:ok, world} = Syms.World.Registry.lookup(registry, name)
-  
-      Syms.World.put(world, name, %{items: ["yay"]})
-      assert Syms.World.get(world, name) == %{items: ["yay"]}
+      assert {:ok, _world} = Syms.World.Registry.lookup(registry, name)
     end
 
     test "removes worlds on exit", %{registry: registry, name: name} do
         Syms.World.Registry.create(registry, name)
         {:ok, world} = Syms.World.Registry.lookup(registry, name)
 
-        Agent.stop(world)
+        GenServer.stop(world)
 
         reg_call(registry)
         
@@ -33,7 +30,7 @@ defmodule Syms.RegistryTest do
         {:ok, world} = Syms.World.Registry.lookup(registry, "world1")
       
         # Stop the world with non-normal reason
-        Agent.stop(world, :shutdown)
+        GenServer.stop(world, :shutdown)
 
 
         reg_call(registry)

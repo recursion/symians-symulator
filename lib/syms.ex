@@ -8,7 +8,7 @@ defmodule Syms do
      Syms.Supervisor.start_link(name: Syms.Supervisor)
   end
 
-  def create_world(opts) do
-    Syms.World.start_link(opts)
+  def create_world(name \\ "unnamed_world") do
+    Syms.World.Registry.create(Syms.World.Registry, name)
   end
 end

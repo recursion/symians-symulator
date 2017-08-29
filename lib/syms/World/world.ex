@@ -1,11 +1,11 @@
 defmodule Syms.World do
     use GenServer
 
-    defstruct dimensions: {0, 0, 0}, locations: %{}
-
     @moduledoc """
     a world is a %Map{} of locations keyed by coordinates
+    `dimensions` is the length, width, and height of the world
     """
+    defstruct dimensions: {0, 0, 0}, locations: %{}
                          
     @doc """
     Creates an empty world
@@ -15,40 +15,32 @@ defmodule Syms.World do
     end
 
     @doc """
-    generate a world of size dimensions
+    create a world from dimensions
     """
-    def generate(world, dimensions) do
-        GenServer.cast(world, {:generate, dimensions})
+    def create(world, dimensions) do
+        GenServer.cast(world, {:create, dimensions})
     end
 
     @doc """
-    returns the locations stored in the key `coordinates`
+    return the entire world
     """
-    def get_location(world, coordinates) do
-        GenServer.call(world, {:get_location, coordinates})
+    def view(world) do
+        GenServer.call(world, {:view})
     end
 
     @doc """
-    put object at the location at coordinates
+    returns the location stored in the key `coordinates`
+    """
+    def get(world, coordinates) do
+        GenServer.call(world, {:get, coordinates})
+    end
+
+    @doc """
+    put object at location coordinates
     """
     def put(world, coordinates, game_object) do
-        current_location = get_location(world, coordinates)
-        next_location = 
-            case current_location do
-                ## TODO: Some checks to make sure an object can be moved here
-                nil -> []
-                [] ->
-                    [game_object]
-                [_] ->
-                    [game_object] ++ current_location
-
-            end
+        current_location = get(world, coordinates)
+        next_location = Syms.World.Location.put(current_location, game_object)
         GenServer.call(world, {:update_location, coordinates, next_location})
     end
-
-    ## view the model - used for debugging
-    def view(world) do
-        GenServer.cast(world, {:view})
-    end
-
 end
