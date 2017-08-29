@@ -10,6 +10,8 @@ defmodule Syms.Application do
     children = [
       # Starts a worker by calling: Syms.Worker.start_link(arg)
       # {Syms.Worker, arg},
+      Syms.World.Supervisor,
+      {Syms.World.Registry, name: Syms.World.Registry}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
