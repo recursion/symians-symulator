@@ -1,22 +1,12 @@
-defmodule Syms.World.Coordinates do
-  @moduledoc """
-  a container of coordinates
-      # Shape:
-          {0, 1, 0}
-  """
-  def to_string({x, y, z}) do
-    "#{x}#{y}#{z}"
-  end
-end
-
 defmodule Syms.World.Location do
   alias Syms.World.Coordinates
+
+  defstruct type: :empty, entities: []
 
   @moduledoc """
       a location is a data structure that has coordinates
       and has a queue for storing items/game objects
   """
-  @location []
 
   @doc """
       location: a key, value pair
@@ -24,7 +14,7 @@ defmodule Syms.World.Location do
       and the value is a location - currently a simple list
   """
   def create(coordinates) do
-    {Coordinates.to_string(coordinates), @location}
+    {Coordinates.to_string(coordinates), %Syms.World.Location{}}
   end
 
   @doc """

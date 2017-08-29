@@ -9,9 +9,9 @@ defmodule Syms.World.Server do
     {:ok, %Syms.World{}}
   end
 
-  ## Calls
+  ## Synchronous Calls
 
-  def handle_call({:update_location, coordinates, location}, _from, state) do
+  def handle_call({:put, coordinates, location}, _from, state) do
     coords = Coordinates.to_string(coordinates)
     next_locations = Map.put(state.locations, coords, location)
     next_world = %Syms.World{state| locations: next_locations}
@@ -28,7 +28,7 @@ defmodule Syms.World.Server do
     {:reply, state, state}
   end
 
-  ## Casts
+  ## Asynchronous Casts
 
   def handle_cast({:generate, dimensions}, state) do
     {l, w, h} = dimensions

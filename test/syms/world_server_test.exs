@@ -12,8 +12,8 @@ defmodule Syms.WorldServerTest do
     assert is_map(locations)
 
     # it is keyed by coordinates
-    assert locations["000"] == []
-    assert locations["555"] == []
+    assert locations["000"] == %Syms.World.Location{}
+    assert locations["555"] == %Syms.World.Location{}
     assert locations["101010"] == nil
   end
 
