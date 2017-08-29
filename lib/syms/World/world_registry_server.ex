@@ -22,9 +22,7 @@ defmodule Syms.World.RegistryServer do
     end
     
     def handle_info({:DOWN, ref, :process, _pid, _reason}, {worlds, refs}) do
-        t = Map.pop(refs, ref)
-        IO.inspect t
-        case t do
+        case Map.pop(refs, ref) do
             {name, refs} -> 
                 :ets.delete(worlds, name)
                 {:noreply, {worlds, refs}}
