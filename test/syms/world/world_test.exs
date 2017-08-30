@@ -14,6 +14,9 @@ defmodule Syms.WorldTest do
       assert world == %Syms.World{}
       assert world.locations == %{}
     end
+    test "has an empty name property", %{world: world} do
+      assert world.name == ""
+    end
   end
   test "generate_locations: create a map of locations keyed by coordinates" do
     locations = Syms.World.generate_locations({5, 5, 5})
@@ -32,5 +35,4 @@ defmodule Syms.WorldTest do
     # it sends back a message when complete
     assert_receive {:locations_generated, _dimensions, _locations, _time}, 1000
   end
-
 end

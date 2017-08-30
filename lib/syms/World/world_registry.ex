@@ -58,7 +58,7 @@ defmodule Syms.World.Registry do
      if Map.has_key?(worlds, name) do
         {:reply, {:noop, :already_exists}, {worlds, refs}}
       else
-        {:ok, pid} = Syms.World.Supervisor.start_world
+        {:ok, pid} = Syms.World.Supervisor.start_world(name)
         ref = Process.monitor(pid)
         refs = Map.put(refs, ref, name)
         # :ets.insert(worlds, {name, pid})

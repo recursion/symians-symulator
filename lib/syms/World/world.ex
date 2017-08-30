@@ -5,7 +5,7 @@ defmodule Syms.World do
     `locations`: a %Map{} of locations where the key is the locations coordinates
     `dimensions` is the length, width, and height of the world
   """
-  defstruct dimensions: {0, 0, 0}, locations: %{}
+  defstruct name: "", dimensions: {0, 0, 0}, locations: %{}
 
   @doc """
   takes a tuple of dimensions and a callback

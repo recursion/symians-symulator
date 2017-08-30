@@ -1,6 +1,6 @@
 defmodule Syms.World.Server do
   require Logger
-  use GenServer
+  use GenServer, restart: :temporary
 
   alias Syms.World.Coordinates
 
@@ -11,11 +11,19 @@ defmodule Syms.World.Server do
   ## Public API
 
   @doc """
-  Creates an empty world
+  Creates a named, empty world
+  the worlds name will eventually be used for its :ets table name
+  args is currently only used from tests that use start_supervised
+  when start_supervised is called, name comes in as an atom is args
+  otherwise the name comes in under name
   """
-  def start_link(options \\ []) do
-    # server = Keyword.fetch!(opts, :name)
-    GenServer.start_link(__MODULE__, [], options)
+  def start_link(args, name \\ "") do
+    name = if is_atom args do
+        Atom.to_string args
+      else
+        name
+      end
+    GenServer.start_link(__MODULE__, [name: name], [])
   end
 
   @doc """
@@ -48,8 +56,9 @@ defmodule Syms.World.Server do
 
   ## Server Functions
 
-  def init(_options \\ []) do
-    {:ok, %Syms.World{}}
+  def init(options \\ []) do
+    name = Keyword.fetch!(options, :name)
+    {:ok, %Syms.World{name: name}}
   end
 
   ## Synchronous Calls

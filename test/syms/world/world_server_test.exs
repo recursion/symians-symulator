@@ -5,6 +5,10 @@ defmodule Syms.World.ServerTest do
   @moduledoc """
   Tests the World Server
   """
+  test "is a temporary worker" do
+    assert Supervisor.child_spec(Syms.World.Server, []).restart == :temporary
+  end
+
   describe "put" do
     setup do
       {:ok, world} = start_supervised(Syms.World.Server)
@@ -17,15 +21,16 @@ defmodule Syms.World.ServerTest do
       assert WorldServer.put(world, {0, 0, 0}, %Syms.World.Location{type: :grass})
     end
   end
+
   describe "when initialized" do
     setup do
-      {:ok, world} = start_supervised(Syms.World.Server)
+      {:ok, world} = start_supervised({Syms.World.Server, :testworld})
       %{world: world}
     end
 
     test "view returns a %Syms.World{} struct", %{world: world} do
       subject = WorldServer.view(world)
-      assert subject == %Syms.World{}
+      assert subject == %Syms.World{name: "testworld"}
     end
 
     test "get returns nil for any set of coordinates", %{world: world} do
@@ -41,7 +46,7 @@ defmodule Syms.World.ServerTest do
 
   describe "when generate completes" do
     setup do
-      {:ok, world} = start_supervised(WorldServer)
+      {:ok, world} = start_supervised({WorldServer, :testworld})
       WorldServer.generate(world, {5, 5, 5})
       Process.sleep(25)
       %{world: world}

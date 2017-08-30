@@ -8,8 +8,8 @@ defmodule Syms.World.Supervisor do
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  def start_world do
-    Supervisor.start_child(__MODULE__, [])
+  def start_world(name) do
+    Supervisor.start_child(__MODULE__, [name])
   end
 
   def init(:ok) do
