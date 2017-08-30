@@ -13,6 +13,6 @@ defmodule Syms.World.Supervisor do
   end
 
   def init(:ok) do
-    Supervisor.init([{Syms.World.Server, []}], strategy: :simple_one_for_one)
+    Supervisor.init([{Syms.World, []}], strategy: :simple_one_for_one)
   end
 end

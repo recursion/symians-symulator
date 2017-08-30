@@ -1,6 +1,5 @@
 defmodule Syms.World.Server do
   require Logger
-  use GenServer, restart: :temporary
 
   alias Syms.World.Coordinates
 
@@ -8,62 +7,17 @@ defmodule Syms.World.Server do
   genserver for managing a world's state
   """
 
-  ## Public API
 
-  @doc """
-  Creates a named, empty world
-  the worlds name will eventually be used for its :ets table name
-  args is currently only used from tests that use start_supervised
-  when start_supervised is called, name comes in as an atom is args
-  otherwise the name comes in under name
-  """
-  def start_link(args, name \\ "") do
-    name = if is_atom args do
-        Atom.to_string args
-      else
-        name
-      end
-    GenServer.start_link(__MODULE__, [name: name], [])
-  end
-
-  @doc """
-  generate a map of locations sized from dimensions`
-  """
-  def generate(world, dimensions) do
-    GenServer.cast(world, {:generate, dimensions})
-  end
-
-  @doc """
-  return the world struct
-  """
-  def view(world) do
-    GenServer.call(world, {:view})
-  end
-
-  @doc """
-  returns the location stored in the key `coordinates`
-  """
-  def get(world, coordinates) do
-    GenServer.call(world, {:get, coordinates})
-  end
-
-  @doc """
-  put a location at coordinates
-  """
-  def put(world, coordinates, location = %Syms.World.Location{}) do
-    GenServer.call(world, {:put, coordinates, location})
-  end
-
-  ## Server Functions
-
-  def init(options \\ []) do
+  def init(options) do
     name = Keyword.fetch!(options, :name)
+    # create the ets table here
     {:ok, %Syms.World{name: name}}
   end
-
+  
   ## Synchronous Calls
 
   def handle_call({:put, coordinates, location}, _from, state) do
+    # do an :ets lookup instead
     coords = Coordinates.to_string(coordinates)
     next_locations = Map.put(state.locations, coords, location)
     next_world = %Syms.World{state| locations: next_locations}
@@ -71,12 +25,14 @@ defmodule Syms.World.Server do
   end
 
   def handle_call({:get, coordinates}, _from, state) do
+    # do an :ets lookup instead
     coords = Coordinates.to_string(coordinates)
     location = Map.get(state.locations, coords)
     {:reply, location, state}
   end
 
   def handle_call({:view}, _from, state) do
+    # use World.map to generate coordinates and look them up from :ets
     {:reply, state, state}
   end
 
