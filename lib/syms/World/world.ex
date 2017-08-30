@@ -1,6 +1,5 @@
 defmodule Syms.World do
   use GenServer, restart: :temporary
-  alias Syms.World.Location
   @moduledoc """
   a world is a structure containing:
     `locations`: a %Map{} of locations where the key is the locations coordinates
@@ -10,10 +9,9 @@ defmodule Syms.World do
 
   @doc """
   Creates a named, empty world
-  the worlds name will eventually be used for its :ets table name
   args is currently only used from tests that use start_supervised
-  when start_supervised is called, name comes in as an atom is args
-  otherwise the name comes in under name
+    when start_supervised is called, name comes in as an atom is args
+    otherwise the name comes in under name
   """
   def start_link(args, name \\ "THE UNNAMED") do
     name = if is_atom(args), do: Atom.to_string(args), else: name
@@ -70,7 +68,7 @@ defmodule Syms.World do
   """
   def generate_locations(dimensions) do
     map(dimensions, fn coords ->
-      Location.create(coords)
+      {Syms.World.Coordinates.to_string(coords), %Syms.World.Location{}}
     end)
   end
 
