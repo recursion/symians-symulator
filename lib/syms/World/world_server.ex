@@ -10,30 +10,41 @@ defmodule Syms.World.Server do
 
   def init(options) do
     name = Keyword.fetch!(options, :name)
-    # create the ets table here
+    :ets.new(:"#{name}", [:named_table])
     {:ok, %Syms.World{name: name}}
   end
-  
+
   ## Synchronous Calls
 
   def handle_call({:put, coordinates, location}, _from, state) do
-    # do an :ets lookup instead
     coords = Coordinates.to_string(coordinates)
-    next_locations = Map.put(state.locations, coords, location)
-    next_world = %Syms.World{state| locations: next_locations}
-    {:reply, :ok, next_world}
+    :ets.insert(:"#{state.name}", {coords, location})
+    {:reply, :ok, state}
   end
 
   def handle_call({:get, coordinates}, _from, state) do
-    # do an :ets lookup instead
-    coords = Coordinates.to_string(coordinates)
-    location = Map.get(state.locations, coords)
-    {:reply, location, state}
+      coords = Coordinates.to_string(coordinates)
+      case :ets.lookup(:"#{state.name}", coords) do
+        [] ->
+          {:reply, nil, state}
+        [{_key, location}] ->
+          {:reply, location, state}
+      end
   end
 
   def handle_call({:view}, _from, state) do
     # use World.map to generate coordinates and look them up from :ets
-    {:reply, state, state}
+    case state.dimensions do
+      {0, 0, 0} ->
+        {:reply, state, state}
+      _ ->
+        locations = Syms.World.map(state.dimensions, fn loc ->
+          coords = Syms.World.Coordinates.to_string(loc)
+          [{_k, location}] = :ets.lookup(:"#{state.name}", coords)
+          {coords, location}
+        end)
+        {:reply, %Syms.World{state | locations: locations}, state}
+      end
   end
 
   ## Asynchronous Casts
@@ -42,8 +53,8 @@ defmodule Syms.World.Server do
     Logger.info fn ->
       "Creating world with dimensions of #{l}*#{w}*#{h}"
     end
-    Syms.World.generate_locations(dimensions, self(), Time.utc_now())
-    {:noreply, state}
+    Syms.World.generate_locations(dimensions, self())
+    {:noreply, %Syms.World{state | dimensions: dimensions}}
   end
 
   def handle_cast(msg, state) do
@@ -54,6 +65,11 @@ defmodule Syms.World.Server do
   end
 
   ## Handle Info functions
+
+  def handle_info({:location_generated, coords}, state) do
+    :ets.insert(:"#{state.name}", Syms.World.Location.create(coords))
+    {:noreply, state}
+  end
 
   def handle_info({:locations_generated, dimensions, locations, time}, state) do
     Logger.info fn ->

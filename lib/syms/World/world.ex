@@ -15,7 +15,7 @@ defmodule Syms.World do
   when start_supervised is called, name comes in as an atom is args
   otherwise the name comes in under name
   """
-  def start_link(args, name \\ "") do
+  def start_link(args, name \\ "THE UNNAMED") do
     name = if is_atom(args), do: Atom.to_string(args), else: name
     GenServer.start_link(Syms.World.Server, [name: name], [])
   end
@@ -71,6 +71,12 @@ defmodule Syms.World do
   def generate_locations(dimensions) do
     map(dimensions, fn coords ->
       Location.create(coords)
+    end)
+  end
+
+  def generate_locations(dimensions, parent) do
+    map(dimensions, fn coords ->
+      send(parent, {:location_generated, coords})
     end)
   end
 

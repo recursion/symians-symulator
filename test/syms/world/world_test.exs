@@ -25,7 +25,7 @@ defmodule Syms.WorldTest do
 
   describe "put: put a location at a set of coordinates" do
     setup do
-      {:ok, world} = start_supervised(Syms.World)
+      {:ok, world} = start_supervised({Syms.World, :testworld1})
       %{world: world}
     end
     test "throws an error if something other than a %Syms.World.Location is used as the third argument", %{world: world} do
@@ -56,13 +56,13 @@ defmodule Syms.WorldTest do
 
   describe "when initialized" do
     setup do
-      {:ok, world} = start_supervised({Syms.World, :testworld})
+      {:ok, world} = start_supervised({Syms.World, :testworld2})
       %{world: world}
     end
 
     test "view returns a %Syms.World{} struct", %{world: world} do
       subject = Syms.World.view(world)
-      assert subject == %Syms.World{name: "testworld"}
+      assert subject == %Syms.World{name: "testworld2"}
     end
 
     test "get returns nil for any set of coordinates", %{world: world} do
@@ -70,8 +70,8 @@ defmodule Syms.WorldTest do
     end
 
     test "put puts a location at coordinates", %{world: world} do
-      assert Syms.World.get(world, {0, 0, 0}) == nil
       Syms.World.put(world, {0, 0, 0}, %Syms.World.Location{})
+      Process.sleep(25)
       assert Syms.World.get(world, {0, 0, 0}) == %Syms.World.Location{}
     end
   end
