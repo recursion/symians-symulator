@@ -1,13 +1,10 @@
 defmodule Syms.World.Server do
   require Logger
 
-  alias Syms.World.Coordinates
-
   @moduledoc """
   genserver for managing a world's state
   """
-
-
+  
   def init(options) do
     name = Keyword.fetch!(options, :name)
     :ets.new(:"#{name}", [:named_table])
