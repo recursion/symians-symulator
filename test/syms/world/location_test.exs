@@ -1,5 +1,6 @@
 defmodule Syms.World.LocationTest do
   use ExUnit.Case, async: true
+  
   describe "%Syms.World.Location{}" do
     setup do
       %{location: %Syms.World.Location{}}

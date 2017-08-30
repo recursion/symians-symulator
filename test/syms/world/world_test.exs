@@ -22,20 +22,7 @@ defmodule Syms.WorldTest do
   test "is a temporary worker" do
     assert Supervisor.child_spec(Syms.World, []).restart == :temporary
   end
-
-  describe "put: put a location at a set of coordinates" do
-    setup do
-      {:ok, world} = start_supervised({Syms.World, :testworld1})
-      %{world: world}
-    end
-    test "throws an error if something other than a %Syms.World.Location is used as the third argument", %{world: world} do
-      catch_error Syms.World.put(world, {0, 0, 0}, "pig")
-    end
-    test "accepts non default locations", %{world: world} do
-      assert Syms.World.put(world, {0, 0, 0}, %Syms.World.Location{type: :grass})
-    end
-  end
-
+  
   test "generate_locations: create a map of locations keyed by coordinates" do
     locations = Syms.World.generate_locations({5, 5, 5})
     # it is a map
@@ -52,6 +39,19 @@ defmodule Syms.WorldTest do
 
     # it sends back a message when complete
     assert_receive {:locations_generated, _dimensions, _locations, _time}, 1000
+  end
+
+  describe "put: put a location at a set of coordinates" do
+    setup do
+      {:ok, world} = start_supervised({Syms.World, :testworld1})
+      %{world: world}
+    end
+    test "throws an error if something other than a %Syms.World.Location is used as the third argument", %{world: world} do
+      catch_error Syms.World.put(world, {0, 0, 0}, "pig")
+    end
+    test "accepts non default locations", %{world: world} do
+      assert Syms.World.put(world, {0, 0, 0}, %Syms.World.Location{type: :grass})
+    end
   end
 
   describe "when initialized" do
