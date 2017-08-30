@@ -75,8 +75,11 @@ defmodule Syms.World do
   end
 
   def generate_locations(dimensions, parent) do
-    map(dimensions, fn coords ->
-      send(parent, {:location_generated, coords})
+    Task.start(fn ->
+      map(dimensions, fn coords ->
+        send(parent, {:location_generated, coords})
+      end)
+      # send a done message here?
     end)
   end
 

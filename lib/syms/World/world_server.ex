@@ -17,14 +17,12 @@ defmodule Syms.World.Server do
   ## Synchronous Calls
 
   def handle_call({:put, coordinates, location}, _from, state) do
-    coords = Coordinates.to_string(coordinates)
-    :ets.insert(:"#{state.name}", {coords, location})
+    :ets.insert(:"#{state.name}", {coordinates, location})
     {:reply, :ok, state}
   end
 
   def handle_call({:get, coordinates}, _from, state) do
-      coords = Coordinates.to_string(coordinates)
-      case :ets.lookup(:"#{state.name}", coords) do
+      case :ets.lookup(:"#{state.name}", coordinates) do
         [] ->
           {:reply, nil, state}
         [{_key, location}] ->
@@ -39,9 +37,8 @@ defmodule Syms.World.Server do
         {:reply, state, state}
       _ ->
         locations = Syms.World.map(state.dimensions, fn loc ->
-          coords = Syms.World.Coordinates.to_string(loc)
-          [{_k, location}] = :ets.lookup(:"#{state.name}", coords)
-          {coords, location}
+          [{_k, location}] = :ets.lookup(:"#{state.name}", loc)
+          {Syms.World.Coordinates.to_string(loc), location}
         end)
         {:reply, %Syms.World{state | locations: locations}, state}
       end
@@ -67,7 +64,7 @@ defmodule Syms.World.Server do
   ## Handle Info functions
 
   def handle_info({:location_generated, coords}, state) do
-    :ets.insert(:"#{state.name}", Syms.World.Location.create(coords))
+    :ets.insert(:"#{state.name}", {coords, %Syms.World.Location{}})
     {:noreply, state}
   end
 

@@ -42,9 +42,9 @@ defmodule Syms.WorldTest do
     assert is_map(locations)
 
     # it is keyed by coordinates
-    assert locations["000"] == %Syms.World.Location{}
-    assert locations["555"] == %Syms.World.Location{}
-    assert locations["101010"] == nil
+    assert locations["0|0|0"] == %Syms.World.Location{}
+    assert locations["5|5|5"] == %Syms.World.Location{}
+    assert locations["10|10|10"] == nil
   end
 
   test "generate_locations_task: runs a task that creates a map of locations keyed by coordinates" do
@@ -87,7 +87,7 @@ defmodule Syms.WorldTest do
     test "locations exist for all coordinates", %{world: world} do
       assert Syms.World.view(world).dimensions == {5, 5, 5}
       for l <- 0..5, w <- 0..5, h <- 0..5 do
-          assert Syms.World.view(world).locations["#{l}#{w}#{h}"] == %Syms.World.Location{}
+          assert Syms.World.view(world).locations[Syms.World.Coordinates.to_string({l, w, h})] == %Syms.World.Location{}
       end
     end
 
