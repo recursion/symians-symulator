@@ -10,7 +10,7 @@ defmodule Syms.World.Registry do
   @doc """
   Starts the registry.
   """
-  def start_link(opts) do
+  def start_link(opts \\ []) do
     server = Keyword.fetch!(opts, :name)
     GenServer.start_link(__MODULE__, server, opts)
   end
@@ -54,7 +54,7 @@ defmodule Syms.World.Registry do
       {:ok, _pid} ->
         {:reply, {:noop, :already_exists}, {worlds, refs}}
       :error ->
-        {:ok, pid} = Syms.World.Supervisor.start_world()
+        {:ok, pid} = Syms.World.Supervisor.start_world
         ref = Process.monitor(pid)
         refs = Map.put(refs, ref, name)
         :ets.insert(worlds, {name, pid})

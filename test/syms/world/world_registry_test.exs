@@ -1,4 +1,4 @@
-defmodule Syms.RegistryTest do
+defmodule Syms.World.RegistryTest do
   use ExUnit.Case, async: true
 
   setup context do

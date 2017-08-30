@@ -1,11 +1,53 @@
 defmodule Syms.World.Server do
   require Logger
-  alias Syms.World.{Location, Coordinates}
+  use GenServer
+
+  alias Syms.World.Coordinates
 
   @moduledoc """
-  World Server - manages world state
+  genserver for managing a world's state
   """
-  def init(:ok) do
+
+  ## Public API
+
+  @doc """
+  Creates an empty world
+  """
+  def start_link(options \\ []) do
+    GenServer.start_link(__MODULE__, [], options)
+  end
+
+  @doc """
+  generate a map of locations sized from dimensions`
+  """
+  def generate(world, dimensions) do
+    GenServer.cast(world, {:generate, dimensions})
+  end
+
+  @doc """
+  return the world struct
+  """
+  def view(world) do
+    GenServer.call(world, {:view})
+  end
+
+  @doc """
+  returns the location stored in the key `coordinates`
+  """
+  def get(world, coordinates) do
+    GenServer.call(world, {:get, coordinates})
+  end
+
+  @doc """
+  put a location at coordinates
+  """
+  def put(world, coordinates, location = %Syms.World.Location{}) do
+    GenServer.call(world, {:put, coordinates, location})
+  end
+
+  ## Server Functions
+
+  def init(_options \\ []) do
     {:ok, %Syms.World{}}
   end
 
@@ -30,12 +72,11 @@ defmodule Syms.World.Server do
 
   ## Asynchronous Casts
 
-  def handle_cast({:generate, dimensions}, state) do
-    {l, w, h} = dimensions
+  def handle_cast({:generate, {l, w, h} = dimensions}, state) do
     Logger.info fn ->
       "Creating world with dimensions of #{l}*#{w}*#{h}"
     end
-    generate_locations_async(dimensions, self(), Time.utc_now())
+    Syms.World.generate_locations(dimensions, self(), Time.utc_now())
     {:noreply, state}
   end
 
@@ -46,41 +87,12 @@ defmodule Syms.World.Server do
     {:noreply, state}
   end
 
+  ## Handle Info functions
+
   def handle_info({:locations_generated, dimensions, locations, time}, state) do
     Logger.info fn ->
       "World generated in: #{time / 1000} seconds"
     end
     {:noreply, %Syms.World{state | dimensions: dimensions, locations: locations}}
-  end
-
-  @doc """
-  run a function on every combination of coordinates in the world
-  returns a %Map{}
-  """
-  def process({length, width, height}, process) do
-    for l <- 0..length,
-      w <- 0..width,
-      h <- 0..height,
-      into: %{},
-      do: process.({l, w, h})
-  end
-
-  ## Private functions
-
-  def generate_locations(dimensions) do
-    process(dimensions, fn coords ->
-      Location.create(coords)
-    end)
-  end
-
-  @doc """
-  use a task to generate a 3D matrix of l*w*h dimensions
-  """
-  def generate_locations_async(dimensions, parent, start_time) do
-    Task.start(fn ->
-      locations = generate_locations(dimensions)
-      gen_time = Time.diff(Time.utc_now(), start_time, :millisecond)
-      send(parent, {:locations_generated, dimensions, locations, gen_time})
-    end)
   end
 end

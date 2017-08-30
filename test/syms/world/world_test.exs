@@ -1,13 +1,22 @@
-defmodule Syms.WorldServerTest do
+defmodule Syms.WorldTest do
   use ExUnit.Case, async: true
-  alias Syms.World.Server
 
-  @moduledoc """
-  Tests the World Server
-  """
+  describe "%Syms.World{}" do
+    setup do
+      %{world: %Syms.World{}}
+    end
+    test "has dimensions of {0, 0, 0}", %{world: world} do
+      assert world == %Syms.World{}
+      assert world.dimensions == {0, 0, 0}
+    end
 
+    test "has locations of %{}", %{world: world} do
+      assert world == %Syms.World{}
+      assert world.locations == %{}
+    end
+  end
   test "generate_locations: create a map of locations keyed by coordinates" do
-    locations = Server.generate_locations({5, 5, 5})
+    locations = Syms.World.generate_locations({5, 5, 5})
     # it is a map
     assert is_map(locations)
 
@@ -18,9 +27,10 @@ defmodule Syms.WorldServerTest do
   end
 
   test "generate_locations_task: runs a task that creates a map of locations keyed by coordinates" do
-    Server.generate_locations_async({5, 5, 5}, self(), Time.utc_now())
+    Syms.World.generate_locations({5, 5, 5}, self(), Time.utc_now())
 
     # it sends back a message when complete
     assert_receive {:locations_generated, _dimensions, _locations, _time}, 1000
   end
+
 end

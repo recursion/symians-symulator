@@ -1,44 +1,46 @@
 defmodule Syms.World do
-  use GenServer
-
+  alias Syms.World.Location
   @moduledoc """
-  a world is a %Map{} of locations keyed by coordinates
-  `dimensions` is the length, width, and height of the world
+  a world is a structure containing:
+    `locations`: a %Map{} of locations where the key is the locations coordinates
+    `dimensions` is the length, width, and height of the world
   """
   defstruct dimensions: {0, 0, 0}, locations: %{}
 
   @doc """
-  Creates an empty world
+  takes a tuple of dimensions and a callback
+
+  generates every combination of coordinates within a matrix of provided dimensions
+  invokes the callback on each set of generated coordinates
+
+  returns a %Map{}
   """
-  def start_link(options \\ []) do
-    GenServer.start_link(Syms.World.Server, :ok, options)
+  def map({length, width, height}, callback) do
+    for l <- 0..length,
+      w <- 0..width,
+      h <- 0..height,
+      into: %{},
+      do: callback.({l, w, h})
   end
 
   @doc """
-  generate a world from dimensions
+  create a location for every possible coordinate within the given dimensions
   """
-  def generate(world, dimensions) do
-    GenServer.cast(world, {:generate, dimensions})
+  def generate_locations(dimensions) do
+    map(dimensions, fn coords ->
+      Location.create(coords)
+    end)
   end
 
   @doc """
-  return the world struct
+  create a task to generate locations
+  send result to `parent` when the job is done
   """
-  def view(world) do
-    GenServer.call(world, {:view})
-  end
-
-  @doc """
-  returns the location stored in the key `coordinates`
-  """
-  def get(world, coordinates) do
-    GenServer.call(world, {:get, coordinates})
-  end
-
-  @doc """
-  put location at coordinates
-  """
-  def put(world, coordinates, location) do
-    GenServer.call(world, {:put, coordinates, location})
+  def generate_locations(dimensions, parent, start_time) do
+    Task.start(fn ->
+      locations = generate_locations(dimensions)
+      gen_time = Time.diff(Time.utc_now(), start_time, :millisecond)
+      send(parent, {:locations_generated, dimensions, locations, gen_time})
+    end)
   end
 end
