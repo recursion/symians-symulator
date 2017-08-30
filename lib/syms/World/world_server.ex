@@ -14,6 +14,7 @@ defmodule Syms.World.Server do
   Creates an empty world
   """
   def start_link(options \\ []) do
+    # server = Keyword.fetch!(opts, :name)
     GenServer.start_link(__MODULE__, [], options)
   end
 

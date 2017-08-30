@@ -4,8 +4,7 @@ defmodule Syms.World.Location do
   defstruct type: :empty, entities: []
 
   @moduledoc """
-      a location is a data structure that has coordinates
-      and has a queue for storing items/game objects
+  a location has a type and a list of entities.
   """
 
   @doc """
@@ -18,7 +17,7 @@ defmodule Syms.World.Location do
   end
 
   @doc """
-  put an object on the top of a location
+  put an object on the top of the entities list.
   """
   def put(location, object) do
     case location do
@@ -30,4 +29,6 @@ defmodule Syms.World.Location do
         [object] ++ location
     end
   end
+  # TODO: get an object from the top of the entities list
+  # TODO: iterate over all objects in the entities list
 end
