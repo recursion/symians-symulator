@@ -5,6 +5,7 @@ defmodule Syms.WorldTest do
     setup do
       %{world: %Syms.World{}}
     end
+
     test "has dimensions of {0, 0, 0}", %{world: world} do
       assert world == %Syms.World{}
       assert world.dimensions == {0, 0, 0}
@@ -14,39 +15,41 @@ defmodule Syms.WorldTest do
       assert world == %Syms.World{}
       assert world.locations == %{}
     end
+
     test "has an empty name property", %{world: world} do
       assert world.name == ""
     end
+
+    test "generate_locations: create a map of locations keyed by coordinates" do
+      locations = Syms.World.generate_locations({5, 5, 5})
+      # it is a map
+      assert is_map(locations)
+
+      # it is keyed by coordinates
+      assert locations[{0,0,0}] == %Syms.World.Location{}
+      assert locations[{5,5,5}] == %Syms.World.Location{}
+      assert locations[{10,10,10}] == nil
+    end
   end
 
-  test "is a temporary worker" do
-    assert Supervisor.child_spec(Syms.World, []).restart == :temporary
+  describe "Syms.World" do
+    test "is a temporary worker" do
+      assert Supervisor.child_spec(Syms.World, []).restart == :temporary
+    end
+    test "generate_locations_task: runs a task that creates a map of locations keyed by coordinates" do
+      Syms.World.generate_locations({5, 5, 5}, self(), Time.utc_now())
+
+      # it sends back a message when complete
+      assert_receive {:locations_generated, _dimensions, _locations, _time}, 1000
+    end
   end
   
-  test "generate_locations: create a map of locations keyed by coordinates" do
-    locations = Syms.World.generate_locations({5, 5, 5})
-    # it is a map
-    assert is_map(locations)
-
-    # it is keyed by coordinates
-    assert locations["0|0|0"] == %Syms.World.Location{}
-    assert locations["5|5|5"] == %Syms.World.Location{}
-    assert locations["10|10|10"] == nil
-  end
-
-  test "generate_locations_task: runs a task that creates a map of locations keyed by coordinates" do
-    Syms.World.generate_locations({5, 5, 5}, self(), Time.utc_now())
-
-    # it sends back a message when complete
-    assert_receive {:locations_generated, _dimensions, _locations, _time}, 1000
-  end
-
   describe "put: put a location at a set of coordinates" do
     setup do
       {:ok, world} = start_supervised({Syms.World, :testworld1})
       %{world: world}
     end
-    test "throws an error if something other than a %Syms.World.Location is used as the third argument", %{world: world} do
+    test "only accepts %Syms.World.Location{}'s for the location argument", %{world: world} do
       catch_error Syms.World.put(world, {0, 0, 0}, "pig")
     end
     test "accepts non default locations", %{world: world} do

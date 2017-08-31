@@ -68,7 +68,7 @@ defmodule Syms.World do
   """
   def generate_locations(dimensions) do
     map(dimensions, fn coords ->
-      {Syms.World.Coordinates.to_string(coords), %Syms.World.Location{}}
+      {coords, %Syms.World.Location{}}
     end)
   end
 
