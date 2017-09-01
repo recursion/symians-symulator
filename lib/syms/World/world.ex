@@ -36,7 +36,6 @@ defmodule Syms.World do
 
   @doc """
   returns the location stored in the key `coordinates`
-  TODO: should this be on the Location module instead?
   """
   def get(world, coordinates) do
     GenServer.call(world, {:get, coordinates})
@@ -51,7 +50,7 @@ defmodule Syms.World do
 
   @doc """
   takes a tuple of dimensions and a callback
-  callback must return a keymap: {key: value}
+  callback must return a key, value tuple: {key, value}
   invokes callback on each set of generated coordinates
   returns a %Map{}
   """
