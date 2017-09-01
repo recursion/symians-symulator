@@ -2,14 +2,16 @@ defmodule Syms.World do
   use GenServer, restart: :temporary
   @moduledoc """
   a world is a structure containing:
-    `locations`: a %Map{} of locations where the key is the locations coordinates
+    `name`: a string representing the worlds name - used for :ets storage
+    `locations`: a %Map{} of locations where the key is the
+      locations coordinates
     `dimensions` is the length, width, and height of the world
   """
   defstruct name: "", dimensions: {0, 0, 0}, locations: %{}
 
   @doc """
   Creates a named, empty world
-  args is currently only used from tests that use start_supervised
+  HACK: args is currently only used from tests that use start_supervised
     when start_supervised is called, name comes in as an atom is args
     otherwise the name comes in under name
   """
@@ -28,12 +30,13 @@ defmodule Syms.World do
   @doc """
   return the world struct
   """
-  def view(world) do
-    GenServer.call(world, {:view})
+  def get(world) do
+    GenServer.call(world, {:get})
   end
 
   @doc """
   returns the location stored in the key `coordinates`
+  TODO: this should be on the Location module instead?
   """
   def get(world, coordinates) do
     GenServer.call(world, {:get, coordinates})
@@ -48,11 +51,12 @@ defmodule Syms.World do
 
   @doc """
   takes a tuple of dimensions and a callback
+  callback must return a keymap: {key: value}
 
-  generates every combination of coordinates within a matrix of provided dimensions
+  generates every combination of coordinates within a matrix
+  of provided dimensions
   invokes the callback on each set of generated coordinates
 
-  callback must return a keymap: {key: value}
   returns a %Map{}
   """
   def map({length, width, height}, callback) do

@@ -1,21 +1,13 @@
 # Syms
+##### A world 'symulator: built in elixir
+### Goals
+Generate a 3D 'World' which is ultimately a matrix of 'locations'
+Generate entities which interact with the world in various ways
+Allow (web) clients to view/interact with the world
 
-**TODO: Add description**
-
-## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `syms` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:syms, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/syms](https://hexdocs.pm/syms).
-
+**TODO: everything!**
+* Consolidate the world storage mechanisms
+  * Currently there is a bit of a mishmash between storing world state in a %Syms.World{} map and the :ets cache. Locations are being stored individually by coordinate key in :ets.I think that generating the entire locations map and storing it might make more sense because it will allow easier manipulation. (We can just grab the entire locations map, instead of having to generate all the coordinates every time we want the whole map, which should actually be rare.) I think the idea here will be to store everything in :ets and just put it into the %Syms.World{} map when we are sending it out of the server
+  * Create functions for grabbing subsets of the world
+    * i.e. get all locations within X range of a given coordinate 
+    * get all locations within {length, width, height} starting at a given coordinate
