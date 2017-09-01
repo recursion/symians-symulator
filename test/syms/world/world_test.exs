@@ -45,14 +45,10 @@ defmodule Syms.WorldTest do
       World.generate_locations({5, 5, 5}, self(), Time.utc_now())
 
       # it sends back a message when complete
-      assert_receive {:locations_generated,
-                      _dimensions,
-                      _locations,
-                      _time}, 1000
+      assert_receive {:locations_generated, _locations, _time}, 1000
     end
 
-    test "generate_locations: runs generate_locations as a task
-    - sends back each location as its generated" do
+    test "generate_locations: runs generate_locations as a task" do
       World.generate_locations({5, 5, 5}, self())
 
       # it sends back each location as its generated

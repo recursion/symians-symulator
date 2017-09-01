@@ -8,6 +8,9 @@ defmodule Syms.World.Server do
   and just use the %Syms.World{} struct for returning the world data to clients (since most critical world data is now stored in :ets)
   """
 
+  @doc """
+  extract the world name from options and create an ets table for this world
+  """
   def init(options) do
     name = Keyword.fetch!(options, :name)
     :ets.new(String.to_atom(name), [:named_table])
@@ -17,20 +20,20 @@ defmodule Syms.World.Server do
   # Synchronous Calls
 
   def handle_call({:put, coordinates, location}, _from, state) do
-    case :ets.lookup(String.to_atom(state.name), "locations") do
+    case ets_lookup(state.name, "locations") do
       [] ->
         next_locations = {"locations", %{coordinates => location}}
-        :ets.insert(String.to_atom(state.name), next_locations)
+        ets_insert(state.name, next_locations)
         {:reply, :ok, state}
       [{_key, locations}] ->
         next_locations = {"locations", Map.put(locations, coordinates, location)}
-        :ets.insert(String.to_atom(state.name), next_locations)
+        ets_insert(state.name, next_locations)
         {:reply, :ok, state}
       end
   end
 
   def handle_call({:get, coordinates}, _from, state) do
-      case :ets.lookup(String.to_atom(state.name), "locations") do
+      case ets_lookup(state.name, "locations") do
         [] ->
           {:reply, nil, state}
         [{_key, locations}] ->
@@ -44,7 +47,7 @@ defmodule Syms.World.Server do
       {0, 0, 0} ->
         {:reply, state, state}
       _ ->
-        [{_k, locations}] = :ets.lookup(String.to_atom(state.name), "locations")
+        [{_k, locations}] = ets_lookup(state.name, "locations")
         {:reply, %Syms.World{state | locations: locations}, state}
       end
   end
@@ -56,7 +59,7 @@ defmodule Syms.World.Server do
       "Creating world with dimensions of #{l}*#{w}*#{h}"
     end
     World.generate_locations(dimensions, self(), Time.utc_now())
-    :ets.insert(String.to_atom(state.name), {"dimensions", dimensions})
+    ets_insert(state.name, {"dimensions", dimensions})
     {:noreply, %Syms.World{state | dimensions: dimensions}}
   end
 
@@ -70,16 +73,24 @@ defmodule Syms.World.Server do
   # Handle Info functions
 
   def handle_info({:location_generated, coords}, state) do
-    :ets.insert(String.to_atom(state.name), {coords, %Syms.World.Location{}})
+    ets_insert(state.name, {coords, %Syms.World.Location{}})
     {:noreply, state}
   end
 
-  def handle_info({:locations_generated, dimensions, locations, time}, state) do
+  def handle_info({:locations_generated, locations, time}, state) do
     Logger.info fn ->
       "World generated in: #{time / 1000} seconds"
     end
-    :ets.insert(String.to_atom(state.name), {"locations", locations})
-    {:noreply, %Syms.World{state | dimensions: dimensions,
-                                   locations: locations}}
+    ets_insert(state.name, {"locations", locations})
+    {:noreply, state}
+  end
+
+  # insert value into the :ets table world_name
+  def ets_insert(world_name, value) do
+    :ets.insert(String.to_atom(world_name), value)
+  end
+
+  def ets_lookup(world_name, key) do
+    :ets.lookup(String.to_atom(world_name), key)
   end
 end

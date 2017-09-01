@@ -12,7 +12,7 @@ defmodule Syms.World do
   @doc """
   Creates a named, empty world
   HACK: args is currently only used from tests that use start_supervised
-    when start_supervised is called, name comes in as an atom is args
+    when start_supervised is called, name comes in as an atom 
     otherwise the name comes in under name
   """
   def start_link(args, name \\ "THE UNNAMED") do
@@ -36,7 +36,7 @@ defmodule Syms.World do
 
   @doc """
   returns the location stored in the key `coordinates`
-  TODO: this should be on the Location module instead?
+  TODO: should this be on the Location module instead?
   """
   def get(world, coordinates) do
     GenServer.call(world, {:get, coordinates})
@@ -52,11 +52,7 @@ defmodule Syms.World do
   @doc """
   takes a tuple of dimensions and a callback
   callback must return a keymap: {key: value}
-
-  generates every combination of coordinates within a matrix
-  of provided dimensions
-  invokes the callback on each set of generated coordinates
-
+  invokes callback on each set of generated coordinates
   returns a %Map{}
   """
   def map({length, width, height}, callback) do
@@ -76,6 +72,10 @@ defmodule Syms.World do
     end)
   end
 
+  @doc """
+  task for running generate_locations
+  returns each location as it is generated
+  """
   def generate_locations(dimensions, parent) do
     Task.start(fn ->
       map(dimensions, fn coords ->
@@ -87,13 +87,13 @@ defmodule Syms.World do
 
   @doc """
   create a task to generate locations
-  send result to `parent` when the job is done
+  sends locations once they are all generated
   """
   def generate_locations(dimensions, parent, start_time) do
     Task.start(fn ->
       locations = generate_locations(dimensions)
       gen_time = Time.diff(Time.utc_now(), start_time, :millisecond)
-      send(parent, {:locations_generated, dimensions, locations, gen_time})
+      send(parent, {:locations_generated, locations, gen_time})
     end)
   end
 end
