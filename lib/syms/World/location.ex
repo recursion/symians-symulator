@@ -1,6 +1,6 @@
 defmodule Syms.World.Location do
 
-  defstruct type: :empty, entities: []
+  defstruct type_: :grass, entities: []
 
   @moduledoc """
   a location has a type and a list of entities.
