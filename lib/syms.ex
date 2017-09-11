@@ -9,4 +9,7 @@ defmodule Syms do
   def create_world(name) do
     Syms.World.Registry.create(Syms.World.Registry, name)
   end
+  def lookup(name) do
+    Syms.World.Registry.lookup(Syms.World.Registry, name)
+  end
 end
