@@ -13,7 +13,6 @@ defmodule Syms.Application do
       Syms.World.Supervisor,
       {Syms.World.Registry, name: Syms.World.Registry}
     ]
-
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Syms.Supervisor]

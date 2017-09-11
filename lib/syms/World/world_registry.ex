@@ -17,6 +17,7 @@ defmodule Syms.World.Registry do
     GenServer.start_link(__MODULE__, server, opts)
   end
 
+
   @doc """
   Looks up the world pid for `name` stored in `server`.
   Returns `{:ok, pid}` if the world exists, `:error` otherwise.

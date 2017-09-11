@@ -15,4 +15,5 @@ defmodule Syms.World.Supervisor do
   def init(:ok) do
     Supervisor.init([{Syms.World, []}], strategy: :simple_one_for_one)
   end
+
 end
