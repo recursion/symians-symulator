@@ -68,7 +68,7 @@ defmodule Syms.WorldTest do
     end
 
     test "accepts non default locations", %{world: world} do
-      assert World.put(world, {0, 0, 0}, %Syms.World.Location{type: :grass})
+      assert World.put(world, {0, 0, 0}, %Syms.World.Location{type_: :grass})
     end
   end
 
@@ -122,8 +122,8 @@ defmodule Syms.WorldTest do
     end
 
     test "put puts an object in/on location at coordinates", %{world: world} do
-      World.put(world, {0, 0, 0}, %Syms.World.Location{type: :air})
-      assert World.get(world, {0, 0, 0}) == %Syms.World.Location{type: :air}
+      World.put(world, {0, 0, 0}, %Syms.World.Location{type_: :air})
+      assert World.get(world, {0, 0, 0}) == %Syms.World.Location{type_: :air}
     end
   end
 end
