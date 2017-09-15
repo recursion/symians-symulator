@@ -1,8 +1,8 @@
-defmodule SymsTest do
+defmodule SymulatorTest do
   use ExUnit.Case
-  doctest Syms
+  doctest Symulator
   test "create_world: starts a world and returns its PID" do
-    t = Syms.create_world("World_1001")
+    t = Symulator.create_world("World_1001")
     assert is_pid(t) == true
   end
 end

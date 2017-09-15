@@ -1,4 +1,4 @@
-defmodule Syms.World.Coordinates do
+defmodule Symulator.World.Coordinates do
   @moduledoc """
   a container of coordinates {1, 5, 2}
   """

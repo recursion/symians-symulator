@@ -1,11 +1,11 @@
-defmodule Syms.World.Server do
+defmodule Symulator.World.Server do
   require Logger
-  alias Syms.World
+  alias Symulator.World
 
   @moduledoc """
   genserver for managing a world's state
   TODO: it may be better to only store state required for running the world server in the GenServers state
-  and just use the %Syms.World{} struct for returning the world data to clients (since most critical world data is now stored in :ets)
+  and just use the %Symulator.World{} struct for returning the world data to clients (since most critical world data is now stored in :ets)
   """
 
   @doc """
@@ -14,7 +14,7 @@ defmodule Syms.World.Server do
   def init(options) do
     name = Keyword.fetch!(options, :name)
     :ets.new(String.to_atom(name), [:named_table])
-    {:ok, %Syms.World{name: name}}
+    {:ok, %Symulator.World{name: name}}
   end
 
   # Synchronous Calls
@@ -48,7 +48,7 @@ defmodule Syms.World.Server do
         {:reply, state, state}
       _ ->
         [{_k, locations}] = ets_lookup(state.name, "locations")
-        {:reply, %Syms.World{state | locations: locations}, state}
+        {:reply, %Symulator.World{state | locations: locations}, state}
       end
   end
 
@@ -60,7 +60,7 @@ defmodule Syms.World.Server do
     end
     World.generate_locations(dimensions, self(), Time.utc_now())
     ets_insert(state.name, {"dimensions", dimensions})
-    {:noreply, %Syms.World{state | dimensions: dimensions}}
+    {:noreply, %Symulator.World{state | dimensions: dimensions}}
   end
 
   def handle_cast(msg, state) do
@@ -73,7 +73,7 @@ defmodule Syms.World.Server do
   # Handle Info functions
 
   def handle_info({:location_generated, coords}, state) do
-    ets_insert(state.name, {coords, %Syms.World.Location{}})
+    ets_insert(state.name, {coords, %Symulator.World.Location{}})
     {:noreply, state}
   end
 

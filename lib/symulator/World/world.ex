@@ -1,4 +1,4 @@
-defmodule Syms.World do
+defmodule Symulator.World do
   use GenServer, restart: :temporary
   @moduledoc """
   a world is a structure containing:
@@ -17,7 +17,7 @@ defmodule Syms.World do
   """
   def start_link(args, name \\ "THE UNNAMED") do
     name = if is_atom(args), do: Atom.to_string(args), else: name
-    GenServer.start_link(Syms.World.Server, [name: name], [])
+    GenServer.start_link(Symulator.World.Server, [name: name], [])
   end
 
   @doc """
@@ -44,7 +44,7 @@ defmodule Syms.World do
   @doc """
   put a location at coordinates
   """
-  def put(world, coordinates, location = %Syms.World.Location{}) do
+  def put(world, coordinates, location = %Symulator.World.Location{}) do
     GenServer.call(world, {:put, coordinates, location})
   end
 
@@ -67,7 +67,7 @@ defmodule Syms.World do
   """
   def generate_locations(dimensions) do
     map(dimensions, fn coords ->
-      {coords, %Syms.World.Location{}}
+      {coords, %Symulator.World.Location{}}
     end)
   end
 

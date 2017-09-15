@@ -1,9 +1,9 @@
-defmodule Syms.World.LocationTest do
+defmodule Symulator.World.LocationTest do
   use ExUnit.Case, async: true
   
-  describe "%Syms.World.Location{}" do
+  describe "%Symulator.World.Location{}" do
     setup do
-      %{location: %Syms.World.Location{}}
+      %{location: %Symulator.World.Location{}}
     end
     test "defaults to type :empty", %{location: location} do
       assert location.type_ == :grass

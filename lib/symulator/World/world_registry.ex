@@ -1,4 +1,4 @@
-defmodule Syms.World.Registry do
+defmodule Symulator.World.Registry do
   use GenServer
 
   @moduledoc """
@@ -59,7 +59,7 @@ defmodule Syms.World.Registry do
      if Map.has_key?(worlds, name) do
         {:reply, {:noop, :already_exists}, {worlds, refs}}
       else
-        {:ok, pid} = Syms.World.Supervisor.start_world(name)
+        {:ok, pid} = Symulator.World.Supervisor.start_world(name)
         ref = Process.monitor(pid)
         refs = Map.put(refs, ref, name)
         # :ets.insert(worlds, {name, pid})

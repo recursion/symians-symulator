@@ -1,4 +1,4 @@
-defmodule Syms.World.Supervisor do
+defmodule Symulator.World.Supervisor do
   use Supervisor
   @moduledoc """
   World Supervisor
@@ -13,7 +13,7 @@ defmodule Syms.World.Supervisor do
   end
 
   def init(:ok) do
-    Supervisor.init([{Syms.World, []}], strategy: :simple_one_for_one)
+    Supervisor.init([{Symulator.World, []}], strategy: :simple_one_for_one)
   end
 
 end

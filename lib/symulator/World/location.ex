@@ -1,4 +1,4 @@
-defmodule Syms.World.Location do
+defmodule Symulator.World.Location do
 
   defstruct type_: :grass, entities: []
 
