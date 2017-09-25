@@ -12,4 +12,13 @@ defmodule Symulator.World.LocationTest do
       assert location.entities == []
     end
   end
+  describe "Location.put" do
+    setup do
+      %{location: %Symulator.World.Location{}}
+    end
+    test "adds an object to location.entities", %{location: location} do
+      nextLocation = Symulator.World.Location.put(location,  "grass")
+      assert nextLocation.entities == ["grass"]
+    end
+  end
 end

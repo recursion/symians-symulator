@@ -67,6 +67,7 @@ defmodule Symulator.World do
   """
   def generate_locations(dimensions) do
     map(dimensions, fn coords ->
+      # customize the location here
       {coords, %Symulator.World.Location{}}
     end)
   end

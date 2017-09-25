@@ -10,13 +10,13 @@ defmodule Symulator.World.Location do
   put an object on the top of the entities list.
   """
   def put(location, object) do
-    case location do
+    case location.entities do
       ## TODO: Some checks to make sure an object can be moved here
-      nil -> []
+      nil -> location
       [] ->
-        [object]
+        %{location | entities: [object] }
       [_] ->
-        [object] ++ location
+        %{location | entities: [object] ++ location.entities}
     end
   end
   # TODO: get an object from the top of the entities list
