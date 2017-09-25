@@ -1,6 +1,6 @@
 defmodule Symulator.World.Location do
 
-  defstruct type_: :grass, entities: []
+  defstruct type_: :empty, entities: []
 
   @moduledoc """
   a location has a type and a list of entities.

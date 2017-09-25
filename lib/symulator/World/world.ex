@@ -68,7 +68,15 @@ defmodule Symulator.World do
   def generate_locations(dimensions) do
     map(dimensions, fn coords ->
       # customize the location here
-      {coords, %Symulator.World.Location{}}
+      :random.seed(:erlang.now)
+      type = Enum.random([:grass, :dirt])
+      entities = case type do
+                   :grass ->
+                     Enum.random([["grass"], [], [], [], []])
+                   _ ->
+                     []
+      end
+      {coords, %Symulator.World.Location{type_: type, entities: entities}}
     end)
   end
 
