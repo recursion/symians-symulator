@@ -6,7 +6,7 @@ defmodule Symulator.World.LocationTest do
       %{location: %Symulator.World.Location{}}
     end
     test "defaults to type :empty", %{location: location} do
-      assert location.type_ == :grass
+      assert location.type_ == :empty
     end
     test "has an empty entities list", %{location: location} do
       assert location.entities == []
